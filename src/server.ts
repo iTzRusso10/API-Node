@@ -1,3 +1,5 @@
-const user = "Mario";
+type Name = string;
 
-console.log(`I'm ${user}`);
+const user:Name = "Giuseppe";
+
+throw new Error("Wrong")
