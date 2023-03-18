@@ -2,7 +2,11 @@
   "name": "api-node-project",
   "version": "1.0.0",
   "description": "API Node Modules",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
+    "format" : "prettier --write .",
     "test": "jest"
   },
   "repository": {
@@ -17,5 +21,8 @@
   "homepage": "https://github.com/iTzRusso10/API-Node-Project#readme",
   "dependencies": {
     "jest": "^29.5.0"
+  },
+  "devDependencies": {
+    "prettier": "2.8.4"
   }
 }
