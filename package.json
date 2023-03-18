@@ -1,0 +1,21 @@
+{
+  "name": "api-node-project",
+  "version": "1.0.0",
+  "description": "API Node Modules",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/iTzRusso10/API-Node-Project.git"
+  },
+  "author": "Giuseppe Russo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/iTzRusso10/API-Node-Project/issues"
+  },
+  "homepage": "https://github.com/iTzRusso10/API-Node-Project#readme",
+  "dependencies": {
+    "jest": "^29.5.0"
+  }
+}
