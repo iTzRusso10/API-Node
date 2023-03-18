@@ -1,3 +1,3 @@
-const user:string = "Mario";
+const user = "Mario";
 
-console.log(`I'm ${user}`)
+console.log(`I'm ${user}`);
