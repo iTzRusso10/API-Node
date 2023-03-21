@@ -1,5 +1,7 @@
-type Name = string;
+import app from "./app";
 
-const user:Name = "Giuseppe";
+const port = 3000;
 
-throw new Error("Wrong")
+app.listen(port, () => {
+    console.log(`Server running at port ${port}`);
+});
