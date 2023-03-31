@@ -91,3 +91,48 @@ describe("GET /planets ", () => {
         expect(response.body).toEqual(planets);
     });
 });
+
+describe("GET /planet/:id ", () => {
+    test("Valid Request", async () => {
+        const planet = 
+            {
+                name: "Venere",
+                moons: 10,
+                id: 1,
+                description: null,
+                updateAt: "2023-03-24T00:45:08.174Z",
+            };
+
+        //@ts-ignore
+        prismaMock.planets.findUnique.mockResolvedValue(planet);
+
+        const response = await request
+            .get("/planet/1")
+            .expect(200)
+            .expect("Content-Type", /application\/json/);
+
+        expect(response.body).toEqual(planet);
+    });
+
+    test("Planets does not exist", async () => {
+        //@ts-ignore
+    prismaMock.planets.findUnique.mockResolvedValue(null);
+
+    const response = await request
+    .get("/planets/23")
+    .expect(404)
+    .expect("Content-Type", /text\/html/)
+
+    expect(response.text).toContain("Cannot GET /planets/23")
+    })
+
+    test("ID NaN", async () => {
+
+    const response = await request
+    .get("/planets/23")
+    .expect(404)
+    .expect("Content-Type", /text\/html/)
+
+    expect(response.text).toContain("Cannot GET /planets/23")
+    })
+});
