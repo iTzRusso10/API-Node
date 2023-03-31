@@ -6,14 +6,23 @@ const request = supertest(app);
 describe("POST /planets", () => {
     test("Valid Request", async () => {
         const planet = {
-            name: "Nettuno",
-            moons: 20
+            name: "Mercurio",
+            moons: 20,
+            id: 5,
+            description: null,
+            updateAt: "2023-03-31T05:29:21.768Z",
         };
+
+        //@ts-ignore
+        prismaMock.planets.create.mockResolvedValue(planet);
 
         const response = await request
             .post("/planets")
             .expect(201)
-            .send(planet)
+            .send({
+                name:"Nettuno",
+                moons : 21
+            })
             .expect("Content-Type", /application\/json/);
 
         expect(response.body).toEqual(planet);
@@ -38,7 +47,7 @@ describe("POST /planets", () => {
     });
 });
 
-describe("GET /planets ", ()=> {
+describe("GET /planets ", () => {
     test("Valid Request", async () => {
         const planets = [
             {
@@ -70,16 +79,15 @@ describe("GET /planets ", ()=> {
                 updateAt: "2023-03-24T02:16:27.881Z",
             },
         ];
-    
+
         //@ts-ignore
         prismaMock.planets.findMany.mockResolvedValue(planets);
-    
+
         const response = await request
             .get("/planets")
             .expect(200)
             .expect("Content-Type", /application\/json/);
-    
+
         expect(response.body).toEqual(planets);
     });
-    
-})
+});

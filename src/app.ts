@@ -8,7 +8,6 @@ import {
     PlanetDate,
 } from "./lib/validation";
 
-
 const app = Express();
 app.use(Express.json()); //Serve per consentire effettivamente di aggiungere il corpo quando fai la richiesta POST.
 
@@ -21,8 +20,11 @@ app.get("/planets", async (req, res) => {
     res.json(planets);
 });
 
-app.post("/planets", validate({body: planetSchema}), async (req, res) => {
-    const planets: PlanetDate= req.body;
+app.post("/planets", validate({ body: planetSchema }), async (req, res) => {
+    const planetData: PlanetDate = req.body;
+    const planets = await prisma.planets.create({
+        data: planetData,
+    });
 
     res.status(201).json(planets);
 });
