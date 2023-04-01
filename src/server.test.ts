@@ -20,10 +20,11 @@ describe("POST /planets", () => {
             .post("/planets")
             .expect(201)
             .send({
-                name:"Nettuno",
-                moons : 21
+                name: "Nettuno",
+                moons: 21,
             })
-            .expect("Content-Type", /application\/json/);
+            .expect("Content-Type", /application\/json/)
+            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
 
         expect(response.body).toEqual(planet);
     });
@@ -86,7 +87,8 @@ describe("GET /planets ", () => {
         const response = await request
             .get("/planets")
             .expect(200)
-            .expect("Content-Type", /application\/json/);
+            .expect("Content-Type", /application\/json/)
+            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
 
         expect(response.body).toEqual(planets);
     });
@@ -94,14 +96,13 @@ describe("GET /planets ", () => {
 
 describe("GET /planet/:id ", () => {
     test("Valid Request", async () => {
-        const planet = 
-            {
-                name: "Venere",
-                moons: 10,
-                id: 1,
-                description: null,
-                updateAt: "2023-03-24T00:45:08.174Z",
-            };
+        const planet = {
+            name: "Venere",
+            moons: 10,
+            id: 1,
+            description: null,
+            updateAt: "2023-03-24T00:45:08.174Z",
+        };
 
         //@ts-ignore
         prismaMock.planets.findUnique.mockResolvedValue(planet);
@@ -109,30 +110,138 @@ describe("GET /planet/:id ", () => {
         const response = await request
             .get("/planet/1")
             .expect(200)
-            .expect("Content-Type", /application\/json/);
+            .expect("Content-Type", /application\/json/)
+            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
 
         expect(response.body).toEqual(planet);
     });
 
     test("Planets does not exist", async () => {
         //@ts-ignore
-    prismaMock.planets.findUnique.mockResolvedValue(null);
+        prismaMock.planets.findUnique.mockResolvedValue(null);
 
-    const response = await request
-    .get("/planets/23")
-    .expect(404)
-    .expect("Content-Type", /text\/html/)
+        const response = await request
+            .get("/planets/23")
+            .expect(404)
+            .expect("Content-Type", /text\/html/);
 
-    expect(response.text).toContain("Cannot GET /planets/23")
-    })
+        expect(response.text).toContain("Cannot GET /planets/23");
+    });
 
     test("ID NaN", async () => {
+        const response = await request
+            .get("/planets/23")
+            .expect(404)
+            .expect("Content-Type", /text\/html/);
 
-    const response = await request
-    .get("/planets/23")
-    .expect(404)
-    .expect("Content-Type", /text\/html/)
+        expect(response.text).toContain("Cannot GET /planets/23");
+    });
+});
 
-    expect(response.text).toContain("Cannot GET /planets/23")
-    })
+describe("PUT /planets/:id", () => {
+    test("Valid Request", async () => {
+        const planet = {
+            name: "Mercurio",
+            moons: 20,
+            id: 5,
+            description: "Bel pianeta",
+            updateAt: "2023-03-31T05:29:21.768Z",
+        };
+
+        //@ts-ignore
+        prismaMock.planets.update.mockResolvedValue(planet);
+
+        const response = await request
+            .put("/planets/5")
+            .send({
+                name: "Nettuno",
+                description: "Bel pianeta",
+                moons: 21,
+            })
+            .expect(200)
+            .expect("Content-Type", /application\/json/)
+            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
+
+        expect(response.body).toEqual(planet);
+    });
+
+    test("Invalid Request", async () => {
+        const planet = {
+            moons: 90,
+        };
+
+        const response = await request
+            .put("/planets/13")
+            .send(planet)
+            .expect(422)
+            .expect("Content-Type", /application\/json/);
+
+        expect(response.body).toEqual({
+            errors: {
+                body: expect.any(Array),
+            },
+        });
+    });
+
+    test("Planets does not exist", async () => {
+        //@ts-ignore
+        prismaMock.planets.update.mockRejectedValue(new Error("Error"));
+
+        const response = await request
+            .put("/planets/23")
+            .send({
+                name: "Nettuno",
+                moons: 20,
+            })
+            .expect(404)
+            .expect("Content-Type", /text\/html/);
+
+        expect(response.text).toContain("Cannot PUT /planets/23");
+    });
+
+    test("ID NaN", async () => {
+        const response = await request
+            .put("/planets/ssdf")
+            .send({
+                name: "Mercurio",
+                moons: 20,
+            })
+            .expect(404)
+            .expect("Content-Type", /text\/html/);
+
+        expect(response.text).toContain("Cannot PUT /planets/ssdf");
+    });
+});
+
+describe("DELETE /planets/:id ", () => {
+    test("Valid Request", async () => {
+
+        const response = await request
+            .delete("/planets/1")
+            .expect(204)
+
+        expect(response.text).toEqual("");
+    });
+
+    test("Planets does not exist", async () => {
+        //@ts-ignore
+        prismaMock.planets.delete.mockRejectedValue(new Error("Error"));
+
+        const response = await request
+            .delete("/planets/23")
+            .expect(404)
+            .expect("Content-Type", /text\/html/)
+            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
+
+        expect(response.text).toContain("Cannot DELETE /planets/23");
+    });
+
+    test("ID NaN", async () => {
+        const response = await request
+            .delete("/planets/ewe")
+            .expect(404)
+            .expect("Content-Type", /text\/html/);
+
+        expect(response.text).toContain("Cannot DELETE /planets/ewe");
+    });
 });
