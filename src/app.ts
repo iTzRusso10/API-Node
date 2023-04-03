@@ -8,18 +8,16 @@ import {
     PlanetDate,
 } from "./lib/validation";
 import cors from "cors";
-import { initMulterMiddlware } from "./lib/middleware/multer";
+import { initMulterMiddleware } from "./lib/middleware/multer";
 
-const upload = initMulterMiddlware();
+const upload = initMulterMiddleware();
 
 const app = Express();
 app.use(Express.json()); //Serve per consentire effettivamente di aggiungere il corpo quando fai la richiesta POST.
 const corsOpt = {
-    origin : "http://localhost:8080"
-}
+    origin: "http://localhost:8080",
+};
 app.use(cors(corsOpt));
-
-
 
 app.get("/", (req, res) => {
     res.send("Richiesta ricevuta!");
@@ -76,40 +74,38 @@ app.put(
     }
 );
 
-app.delete(
-    "/planets/:id(\\d+)",
+app.delete("/planets/:id(\\d+)", async (req, res, next) => {
+    const planetId = Number(req.params.id);
+
+    try {
+        await prisma.planets.delete({
+            where: {
+                id: planetId,
+            },
+        });
+
+        res.status(204).end();
+    } catch (error) {
+        res.status(404);
+        next(`Cannot DELETE /planets/${planetId}`);
+    }
+});
+
+app.post(
+    "/planets/:id(\\d+)/photo",
+    upload.single("photo"),
     async (req, res, next) => {
-        const planetId = Number(req.params.id);
+        console.log("request file", req.file);
 
-        try {
-            await prisma.planets.delete({
-                where: {
-                    id: planetId,
-                },
-            });
-
-            res.status(204).end();
-        } catch (error) {
-            res.status(404);
-            next(`Cannot DELETE /planets/${planetId}`);
+        if (!req.file) {
+            res.status(400);
+            return next("No photo file uploaded");
         }
+
+        const photoFileName = req.file.filename;
+        res.status(201).json({ photoFileName });
     }
 );
-
-app.post("/planets/:id(\\d+)/photo", 
-            upload.single("photo"),
-            async (req,res,next) => {
-                console.log("request file", req.file);
-
-                if(!req.file){
-                    res.status(400);
-                    return next("No photo file uploaded")
-                }
-
-                const photoFileName = req.file.filename;
-                res.status(201).json({photoFileName})
-})
-
 
 app.use(validationErrorMiddleware);
 

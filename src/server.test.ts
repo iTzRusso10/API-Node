@@ -24,7 +24,7 @@ describe("POST /planets", () => {
                 moons: 21,
             })
             .expect("Content-Type", /application\/json/)
-            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
+            .expect("Access-Control-Allow-Origin", "http://localhost:8080");
 
         expect(response.body).toEqual(planet);
     });
@@ -88,7 +88,7 @@ describe("GET /planets ", () => {
             .get("/planets")
             .expect(200)
             .expect("Content-Type", /application\/json/)
-            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
+            .expect("Access-Control-Allow-Origin", "http://localhost:8080");
 
         expect(response.body).toEqual(planets);
     });
@@ -111,7 +111,7 @@ describe("GET /planet/:id ", () => {
             .get("/planet/1")
             .expect(200)
             .expect("Content-Type", /application\/json/)
-            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
+            .expect("Access-Control-Allow-Origin", "http://localhost:8080");
 
         expect(response.body).toEqual(planet);
     });
@@ -160,7 +160,7 @@ describe("PUT /planets/:id", () => {
             })
             .expect(200)
             .expect("Content-Type", /application\/json/)
-            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
+            .expect("Access-Control-Allow-Origin", "http://localhost:8080");
 
         expect(response.body).toEqual(planet);
     });
@@ -215,10 +215,7 @@ describe("PUT /planets/:id", () => {
 
 describe("DELETE /planets/:id ", () => {
     test("Valid Request", async () => {
-
-        const response = await request
-            .delete("/planets/1")
-            .expect(204)
+        const response = await request.delete("/planets/1").expect(204);
 
         expect(response.text).toEqual("");
     });
@@ -231,7 +228,7 @@ describe("DELETE /planets/:id ", () => {
             .delete("/planets/23")
             .expect(404)
             .expect("Content-Type", /text\/html/)
-            .expect("Access-Control-Allow-Origin" , "http://localhost:8080");
+            .expect("Access-Control-Allow-Origin", "http://localhost:8080");
 
         expect(response.text).toContain("Cannot DELETE /planets/23");
     });
@@ -247,21 +244,29 @@ describe("DELETE /planets/:id ", () => {
 });
 
 describe("POST planets/:id/photo", () => {
+    test("Valid request with PNG photos", async () => {
+        await request
+            .post("/planets/21/photo")
+            .attach("photo", "test-fixtures/photos/file.png")
+            .expect(201)
+            .expect("Access-Control-Allow-Origin", "http://localhost:8080");
+    });
+
     test("Invalid PLanet ID", async () => {
         const response = await request
-        .post("/planets/asd/photo")
-        .expect(404)
-        .expect("Content-Type", /text\/html/);
+            .post("/planets/asd/photo")
+            .expect(404)
+            .expect("Content-Type", /text\/html/);
 
-        expect(response.text).toContain("Cannot POST /planets/asd/photo")
-    })
+        expect(response.text).toContain("Cannot POST /planets/asd/photo");
+    });
 
     test("Invalid Request with no file photo uploaded", async () => {
         const response = await request
-        .post("/planets/21/photo")
-        .expect(400)
-        .expect("Content-Type", /text\/html/);
+            .post("/planets/21/photo")
+            .expect(400)
+            .expect("Content-Type", /text\/html/);
 
-        expect(response.text).toContain("No photo file uploaded")
-    })
-})
+        expect(response.text).toContain("No photo file uploaded");
+    });
+});
