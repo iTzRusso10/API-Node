@@ -8,7 +8,9 @@ import {
     PlanetDate,
 } from "./lib/validation";
 import cors from "cors";
+import { initMulterMiddlware } from "./lib/middleware/multer";
 
+const upload = initMulterMiddlware();
 
 const app = Express();
 app.use(Express.json()); //Serve per consentire effettivamente di aggiungere il corpo quando fai la richiesta POST.
@@ -93,6 +95,21 @@ app.delete(
         }
     }
 );
+
+app.post("/planets/:id(\\d+)/photo", 
+            upload.single("photo"),
+            async (req,res,next) => {
+                console.log("request file", req.file);
+
+                if(!req.file){
+                    res.status(400);
+                    return next("No photo file uploaded")
+                }
+
+                const photoFileName = req.file.filename;
+                res.status(201).json({photoFileName})
+})
+
 
 app.use(validationErrorMiddleware);
 
